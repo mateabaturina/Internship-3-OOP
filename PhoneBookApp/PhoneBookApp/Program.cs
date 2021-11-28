@@ -48,10 +48,10 @@ namespace PhoneBookApp
                 case "3":
                     DeleteContacts(phoneBook);
                     return true;
-                /*case "4":
+                case "4":
                     EditingContactPreferences(phoneBook);
                     return true;
-                case "5":
+                /*case "5":
                     Submenu(phoneBook);
                     return true;
                 case "6":
@@ -71,7 +71,7 @@ namespace PhoneBookApp
 
             foreach (var item in phoneBook.Keys)
 
-                Console.WriteLine(item.name + " - " + item.phoneNumber);
+                Console.WriteLine(item.name + " - " + item.phoneNumber + " - " + item.preference);
 
             Console.WriteLine("Pritisnite enter za povratak na izbornik...");
             Console.ReadLine();
@@ -79,7 +79,7 @@ namespace PhoneBookApp
 
         private static string CheckingNameInput(string name)
         {
-            if (string.IsNullOrEmpty(name))
+            while (string.IsNullOrEmpty(name))
             {
                 Console.WriteLine("Ime i prezime ne moze biti prazno! Molim vas ponovo unesite.");
                 Console.Write("\r\nUnesite ime i prezime: ");
@@ -89,7 +89,27 @@ namespace PhoneBookApp
             return name;
         }
 
-        private static string CheckingPhoneNumberInput(string phoneNumber, Dictionary<Contact, List<Call>> phoneBook)
+        private static string CheckingIfNameExists(string name, Dictionary<Contact, List<Call>> phoneBook)
+        {
+            int count = 0;
+
+            foreach (var item in phoneBook.Keys)
+            {
+                if (name == item.name)
+                    count++;
+            }
+
+            if (count == 0)
+            {
+                Console.WriteLine("Kontakt s tim imenom i prezimenom ne postoji! Molim vas ponovo unesite.");
+                Console.Write("\r\nUnesite ime i prezime: ");
+                name = Console.ReadLine();
+            }
+
+            return name;
+        }
+
+        private static string CheckingPhoneNumberInput(string phoneNumber)
         {
             if (string.IsNullOrEmpty(phoneNumber))
             {
@@ -105,7 +125,7 @@ namespace PhoneBookApp
         {
             foreach (var item in phoneBook.Keys)
             {
-                if (phoneNumber == item.phoneNumber)
+                while (phoneNumber == item.phoneNumber)
                 {
                     Console.WriteLine("Kontakt s tim brojem već postoji! Molim vas ponovo unesite.");
                     Console.Write("\r\nUnesite broj telefona: ");
@@ -114,6 +134,21 @@ namespace PhoneBookApp
             }
 
             return phoneNumber;
+        }
+
+        private static string CheckingPreferenceInput(string preference)
+        {
+            while (string.IsNullOrEmpty(preference) | preference != "favorit" | preference != "normalan" | preference != "blokiran kontakt")
+            {
+                Console.WriteLine("Preferenca ne moze biti prazna! Molim vas ponovo unesite.");
+                Console.Write("\r\nUnesite novu preferencu(favorit/normalan/blokiran kontakt): ");
+                preference = Console.ReadLine();
+
+                if (preference == "favorit" | preference == "normalan" | preference == "blokiran kontakt")
+                    break;
+            }
+
+            return preference;
         }
 
         private static void AddingNewContacts(Dictionary<Contact, List<Call>> phoneBook)
@@ -128,7 +163,7 @@ namespace PhoneBookApp
             Console.Write("\r\nUnesite broj telefona: ");
             var phoneNumber = Console.ReadLine();
 
-            phoneNumber = CheckingPhoneNumberInput(phoneNumber, phoneBook);
+            phoneNumber = CheckingPhoneNumberInput(phoneNumber);
             phoneNumber = CheckingIfPhoneNumberAlreadyExists(phoneNumber, phoneBook);
 
             phoneBook.Add(new Contact(name, phoneNumber, null), new List<Call>());
@@ -149,6 +184,30 @@ namespace PhoneBookApp
             { 
                 if (name == item.name)
                     phoneBook.Remove(item);
+            }
+
+            PrintAllContacts(phoneBook);
+        }
+
+        private static void EditingContactPreferences(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            Console.Clear();
+
+            Console.Write("\r\nUnesite ime i prezime: ");
+            var name = Console.ReadLine();
+
+            name = CheckingNameInput(name);
+            name = CheckingIfNameExists(name, phoneBook);
+
+            Console.Write("\r\nUnesite novu preferencu(favorit/normalan/blokiran kontakt): ");
+            var preference = Console.ReadLine();
+
+            preference = CheckingPreferenceInput(preference);
+
+            foreach (var item in phoneBook.Keys)
+            {
+                if (name == item.name)
+                    item.preference = preference;
             }
 
             PrintAllContacts(phoneBook);
