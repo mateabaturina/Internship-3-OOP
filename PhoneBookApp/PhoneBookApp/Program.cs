@@ -51,10 +51,10 @@ namespace PhoneBookApp
                 case "4":
                     EditingContactPreferences(phoneBook);
                     return true;
-                /*case "5":
+                case "5":
                     Submenu(phoneBook);
                     return true;
-                case "6":
+                /*case "6":
                     PrintAllCalls(phoneBook);
                     return true;*/
                 case "7":
@@ -109,9 +109,22 @@ namespace PhoneBookApp
             return name;
         }
 
+        private static string NameInput(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            Console.Clear();
+
+            Console.Write("\r\nUnesite ime i prezime: ");
+            var name = Console.ReadLine();
+
+            name = CheckingNameInput(name);
+            name = CheckingIfNameExists(name, phoneBook);
+
+            return name;
+        }
+
         private static string CheckingPhoneNumberInput(string phoneNumber)
         {
-            if (string.IsNullOrEmpty(phoneNumber))
+            while (string.IsNullOrEmpty(phoneNumber))
             {
                 Console.WriteLine("Broj telefona ne moze biti prazan! Molim vas ponovo unesite.");
                 Console.Write("\r\nUnesite broj telefona: ");
@@ -130,8 +143,20 @@ namespace PhoneBookApp
                     Console.WriteLine("Kontakt s tim brojem već postoji! Molim vas ponovo unesite.");
                     Console.Write("\r\nUnesite broj telefona: ");
                     phoneNumber = Console.ReadLine();
+                    phoneNumber = CheckingPhoneNumberInput(phoneNumber);
                 }
             }
+
+            return phoneNumber;
+        }
+
+        private static string PhoneNumberInput(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            Console.Write("\r\nUnesite broj telefona: ");
+            var phoneNumber = Console.ReadLine();
+
+            phoneNumber = CheckingPhoneNumberInput(phoneNumber);
+            phoneNumber = CheckingIfPhoneNumberAlreadyExists(phoneNumber, phoneBook);
 
             return phoneNumber;
         }
@@ -151,34 +176,30 @@ namespace PhoneBookApp
             return preference;
         }
 
+        private static string PreferenceInput(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            Console.Write("\r\nUnesite novu preferencu(favorit/normalan/blokiran kontakt): ");
+            var preference = Console.ReadLine();
+
+            preference = CheckingPreferenceInput(preference);
+
+            return preference;
+        }
+
         private static void AddingNewContacts(Dictionary<Contact, List<Call>> phoneBook)
         {
-            Console.Clear();
-            
-            Console.Write("\r\nUnesite ime i prezime: ");
-            var name = Console.ReadLine();
+            var name = NameInput(phoneBook);
+            var phoneNumber = PhoneNumberInput(phoneBook);
+            var preference = PreferenceInput(phoneBook);
 
-            name = CheckingNameInput(name);
-
-            Console.Write("\r\nUnesite broj telefona: ");
-            var phoneNumber = Console.ReadLine();
-
-            phoneNumber = CheckingPhoneNumberInput(phoneNumber);
-            phoneNumber = CheckingIfPhoneNumberAlreadyExists(phoneNumber, phoneBook);
-
-            phoneBook.Add(new Contact(name, phoneNumber, null), new List<Call>());
+            phoneBook.Add(new Contact(name, phoneNumber, preference), new List<Call>());
 
             PrintAllContacts(phoneBook);
         }
 
         private static void DeleteContacts(Dictionary<Contact, List<Call>> phoneBook)
         {
-            Console.Clear();
-
-            Console.Write("\r\nUnesite ime i prezime: ");
-            var name = Console.ReadLine();
-
-            name = CheckingNameInput(name);
+            var name = NameInput(phoneBook);
 
             foreach (var item in phoneBook.Keys)
             { 
@@ -191,18 +212,8 @@ namespace PhoneBookApp
 
         private static void EditingContactPreferences(Dictionary<Contact, List<Call>> phoneBook)
         {
-            Console.Clear();
-
-            Console.Write("\r\nUnesite ime i prezime: ");
-            var name = Console.ReadLine();
-
-            name = CheckingNameInput(name);
-            name = CheckingIfNameExists(name, phoneBook);
-
-            Console.Write("\r\nUnesite novu preferencu(favorit/normalan/blokiran kontakt): ");
-            var preference = Console.ReadLine();
-
-            preference = CheckingPreferenceInput(preference);
+            var name = NameInput(phoneBook);
+            var preference = PreferenceInput(phoneBook);
 
             foreach (var item in phoneBook.Keys)
             {
@@ -211,6 +222,35 @@ namespace PhoneBookApp
             }
 
             PrintAllContacts(phoneBook);
+        }
+
+        private static void PrintSubmenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Odaberite akciju:");
+            Console.WriteLine("1 - Ispis svih poziva sa tim kontaktom poredan od vremenski najnovijeg prema najstarijem");
+            Console.WriteLine("2 - Kreiranje novog poziva");
+            Console.WriteLine("3 - Izlaz iz submenu");
+            Console.Write("\r\nUnesite odabir: ");
+        }
+
+        private static bool Submenu(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            PrintSubmenu();
+
+            switch (Console.ReadLine())
+            {
+               /* case "1":
+                    PrintAllCallsWithContact(phoneBook);
+                    return true;
+                case "2":
+                    CreatingNewCall(phoneBook);
+                    return true;*/
+                case "3":
+                    return false;
+                default:
+                    return true;
+            }
         }
     }
 }
