@@ -27,13 +27,15 @@ namespace PhoneBookApp
         private static void PrintMenu()
         {
             Console.Clear();
+            Console.WriteLine("Dobrodošli u imenik!");
+            Console.WriteLine();
             Console.WriteLine("Odaberite akciju:");
             Console.WriteLine();
             Console.WriteLine("1 - Ispis svih kontakata");
             Console.WriteLine("2 - Dodavanje novih kontakata u imenik");
             Console.WriteLine("3 - Brisanje kontakata iz imenika");
             Console.WriteLine("4 - Editiranje preference kontakta");
-            Console.WriteLine("5 - Upravljanje kontaktom koje otvara podmenu sa sljedecim funkcionalnostima:");
+            Console.WriteLine("5 - Upravljanje kontaktom");
             Console.WriteLine("6 - Ispis svih poziva");
             Console.WriteLine("7 - Izlaz iz aplikacije");
             Console.Write("\r\nUnesite odabir: ");
@@ -64,6 +66,7 @@ namespace PhoneBookApp
                     PrintAllCalls(phoneBook);
                     return true;
                 case "7":
+                    Console.WriteLine("Izašli ste iz aplikacije. Doviđenja!");
                     return false;
                 default:
                     return true;
@@ -313,6 +316,8 @@ namespace PhoneBookApp
         private static void PrintSubmenu()
         {
             Console.Clear();
+            Console.WriteLine("~Upravljanje kontaktom~");
+            Console.WriteLine();
             Console.WriteLine("Odaberite akciju:");
             Console.WriteLine("1 - Ispis svih poziva sa tim kontaktom poredan od vremenski najnovijeg prema najstarijem");
             Console.WriteLine("2 - Kreiranje novog poziva");
