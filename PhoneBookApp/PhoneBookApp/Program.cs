@@ -332,16 +332,15 @@ namespace PhoneBookApp
             }
         }
 
-        /*private static void CheckingIfListIsEmpty(string name, Dictionary<Contact, List<Call>> phoneBook)
+        private static void CheckingIfListIsEmpty(string name, Dictionary<Contact, List<Call>> phoneBook)
         {
             foreach (var contact in phoneBook.Keys)
             {
-                while (name == contact.Name)
+                if (name == contact.Name)
                 {
-                    //List<Call> value = phoneBook[contact];
                     var call = phoneBook[contact];
 
-                    if (!(value?.Any() ?? false))
+                    if (!(call?.Any() ?? false))
                     {
                         Console.WriteLine("Lista poziva je prazna! Nisu obavljeni nikakvi pozivi s tim kontaktom.");
                         Console.ReadLine();
@@ -349,7 +348,7 @@ namespace PhoneBookApp
                     }
                 }
             } 
-        }*/
+        }
 
         private static void PrintAllCallsWithContact(Dictionary<Contact, List<Call>> phoneBook)
         {
@@ -357,6 +356,8 @@ namespace PhoneBookApp
             name = CheckingIfNameExists(name, phoneBook);
 
             Console.WriteLine("Ispis svih poziva sa kontaktom " + name + ": ");
+
+            CheckingIfListIsEmpty(name, phoneBook);
 
             foreach (var contact in phoneBook.Keys)
             {
@@ -493,7 +494,6 @@ namespace PhoneBookApp
 
                 foreach (var call in phoneBook[contact])
                     Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + " Status poziva: " + call.CallStatus);
-                
             }
 
             PressEnter();
