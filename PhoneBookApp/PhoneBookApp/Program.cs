@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PhoneBookApp
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {   
             var phoneBook = new Dictionary<Contact, List<Call>>();
-            phoneBook.Add(new Contact("Mate Matić", "0991234567", 1), new List<Call>());
-            phoneBook.Add(new Contact("Ana Anić", "0995671234", 2), new List<Call>());
-            phoneBook.Add(new Contact("Ena Enić", "0987654321", 3), new List<Call>());
+            phoneBook.Add(new Contact("Mate Matić", "0991234567", 1), new List<Call>() {new Call (DateTime.Now, 1),
+                                                                                       {new Call (DateTime.Now, 2) } });
+            phoneBook.Add(new Contact("Ana Anić", "0995671234", 2), new List<Call>() { new Call(DateTime.Now, 1) });
+            phoneBook.Add(new Contact("Ena Enić", "0987654321", 3), new List<Call>() { new Call(DateTime.Now, 3) });
 
             bool showMenu = true;
             while (showMenu)
@@ -268,11 +270,8 @@ namespace PhoneBookApp
                     foreach (var contact in phoneBook.Keys)
                     {
                         if (name == contact.Name)
-                            contact.PreferenceValue = preference;
-                                            
+                            contact.PreferenceValue = preference;                 
                     }
-
-                    PrintAllContacts(phoneBook);
                 }
 
                 else
@@ -281,7 +280,9 @@ namespace PhoneBookApp
                     Console.Write("\r\nUnesite novu preferencu( 1 - favorit/ 2 - normalan/ 3 - blokiran kontakt ): ");
                     input = Console.ReadLine();
                 }
-            }
+
+                PrintAllContacts(phoneBook);
+            }         
         }
 
         private static void PrintSubmenu()
@@ -303,9 +304,9 @@ namespace PhoneBookApp
                 case "1":
                     PrintAllCallsWithContact(phoneBook);
                     return true;
-                /*case "2":
+                case "2":
                     CreatingNewCall(phoneBook);
-                    return true;*/
+                    return true;
                 case "3":
                     return false;
                 default:
@@ -334,22 +335,99 @@ namespace PhoneBookApp
         private static void PrintAllCallsWithContact(Dictionary<Contact, List<Call>> phoneBook)
         {
             var name = NameInput(phoneBook);
+            name = CheckingIfNameExists(name, phoneBook);
 
             Console.WriteLine("Ispis svih poziva sa kontaktom " + name + ": ");
-            CheckingIfListIsEmpty(name, phoneBook);
 
             foreach (var contact in phoneBook.Keys)
             {
                 while (name == contact.Name)
                 {
-                    foreach (var call in phoneBook[contact])
-                    {
-                        Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + "Status poziva: " + call.CallStatus);
-                    }
+                    foreach (var call in phoneBook[contact])                   
+                        Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + " Status poziva: " + call.CallStatus);
+                    
+                    break;
                 } 
             }
 
             PressEnter();
+        }
+
+        private static string CreatingNewCall_NameInput(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            Console.Clear();
+            Console.Write("\r\nUnesite ime i prezime osobe koju želite kontaktirati: ");
+            var name = Console.ReadLine();
+
+            name = CheckingNameInput(name);
+            name = CheckingIfNameExists(name, phoneBook);
+
+            return name;
+        }
+
+        private static void CreatingNewCall(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            var name = CreatingNewCall_NameInput(phoneBook);
+
+            Random random = new Random(DateTime.Now.Millisecond);
+
+            var answerChoice = random.Next(1, 3);
+            var callDuration = random.Next(1, 20);
+
+            Call currentCall = new Call(DateTime.Now, answerChoice);
+
+            foreach (var contact in phoneBook.Keys)
+            {
+                if (name == contact.Name)
+                {
+                    var List = phoneBook[contact];
+                 
+                    if (contact.PreferenceValue == Contact.Preference.Blocked)
+                    {
+                        Console.WriteLine("Nemoguće obaviti poziv! Osoba je blokirana.");
+                        Console.ReadLine();
+                    }
+
+                    else
+                    {
+                        switch (answerChoice)
+                        {
+                            case 1:
+                                currentCall.CallStatus = Call.Status.Missed;
+                                List.Add(currentCall);
+
+                                Console.WriteLine("Propušten je poziv.");
+                                Console.ReadLine();
+
+                                break;
+
+                            case 2:
+                                currentCall.CallStatus = Call.Status.InProgress;
+
+                                Console.WriteLine($"Poziv u tijeku! Sačekajte dok završi...");
+                                Console.WriteLine(callDuration + "s");
+
+                                Task.Delay(callDuration * 1000).Wait();
+                                
+                                currentCall.CallStatus = Call.Status.Ended;
+                                List.Add(currentCall);
+
+                                Console.WriteLine("Poziv je završen");
+                                Console.ReadLine();
+                                break;
+
+                            case 3:
+                                currentCall.CallStatus = Call.Status.Ended;
+                                List.Add(currentCall);
+
+                                Console.WriteLine("Poziv je završen. Trajanje poziva: " + callDuration + "s.");
+                                Console.ReadLine();
+
+                                break;
+                        }
+                    }
+                }  
+            }
         }
 
         private static void PrintAllCalls(Dictionary<Contact, List<Call>> phoneBook)
@@ -360,17 +438,17 @@ namespace PhoneBookApp
 
             foreach (var contact in phoneBook.Keys)
             {
+                Console.WriteLine();
                 Console.WriteLine("Ispis svih poziva kontakta " + contact.Name + ": ");
-                CheckingIfListIsEmpty(contact.Name, phoneBook);
 
                 foreach (var call in phoneBook[contact])
                 {
-                    Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + "Status poziva: " + call.CallStatus);
-                    Console.ReadLine();
+                    Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + " Status poziva: " + call.CallStatus);
+                    
                 }
             }
 
-            PressEnter(); 
+            PressEnter();
         }
     }
 }

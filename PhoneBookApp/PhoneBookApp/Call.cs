@@ -10,9 +10,9 @@ namespace PhoneBookApp
     {
         public enum Status
         {
-            InProgress,
-            Missed,
-            Ended,
+            Missed = 1,
+            InProgress = 2,
+            Ended = 3,
         };
 
         private DateTime timeOfCall;
@@ -21,14 +21,11 @@ namespace PhoneBookApp
         public DateTime TimeOfCall { get => timeOfCall; set => timeOfCall = value; }
         public Status CallStatus { get => callstatus; set => callstatus = value; }
 
-        public Call()
+        public Call(DateTime _timeOfCall, int _callStatus)
         {
-            TimeOfCall = DateTime.Now;
+            TimeOfCall = _timeOfCall;
 
-            Random randomInt = new Random(DateTime.Now.Millisecond);
-            var _callstatus = randomInt.Next(0, 2);
-
-            switch (_callstatus)
+            switch (_callStatus)
             {
                 case 1:
                     CallStatus = Status.Missed;
