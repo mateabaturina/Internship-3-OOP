@@ -365,13 +365,29 @@ namespace PhoneBookApp
             return name;
         }
 
+        private static int CheckingForCallsInProgress(Dictionary<Contact, List<Call>> phoneBook)
+        {
+            var count = 0;
+
+            foreach (var contact in phoneBook.Keys)
+            {
+                foreach (var call in phoneBook[contact])
+                {
+                    if (call.CallStatus == Call.Status.InProgress)
+                        count++;
+                }
+            }
+
+            return count;
+        }
+
         private static void CreatingNewCall(Dictionary<Contact, List<Call>> phoneBook)
         {
             var name = CreatingNewCall_NameInput(phoneBook);
 
             Random random = new Random(DateTime.Now.Millisecond);
 
-            var answerChoice = random.Next(1, 3);
+            var answerChoice = 2;//random.Next(1, 3);
             var callDuration = random.Next(1, 20);
 
             Call currentCall = new Call(DateTime.Now, answerChoice);
@@ -402,18 +418,30 @@ namespace PhoneBookApp
                                 break;
 
                             case 2:
-                                currentCall.CallStatus = Call.Status.InProgress;
+                                var count = CheckingForCallsInProgress(phoneBook);
 
-                                Console.WriteLine($"Poziv u tijeku! Sačekajte dok završi...");
-                                Console.WriteLine(callDuration + "s");
+                                if (count == 0)
+                                {
+                                    currentCall.CallStatus = Call.Status.InProgress;
 
-                                Task.Delay(callDuration * 1000).Wait();
-                                
-                                currentCall.CallStatus = Call.Status.Ended;
-                                List.Add(currentCall);
+                                    Console.WriteLine($"Poziv u tijeku! Sačekajte dok završi...");
+                                    Console.WriteLine(callDuration + "s");
 
-                                Console.WriteLine("Poziv je završen");
-                                Console.ReadLine();
+                                    Task.Delay(callDuration * 1000).Wait();
+
+                                    currentCall.CallStatus = Call.Status.Ended;
+                                    List.Add(currentCall);
+
+                                    Console.WriteLine("Poziv je završen");
+                                    Console.ReadLine();
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine("Nemoguće je obaviti poziv! Postoji poziv u tijeku.");
+                                    Console.ReadLine();
+                                }
+
                                 break;
 
                             case 3:
@@ -442,10 +470,8 @@ namespace PhoneBookApp
                 Console.WriteLine("Ispis svih poziva kontakta " + contact.Name + ": ");
 
                 foreach (var call in phoneBook[contact])
-                {
                     Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + " Status poziva: " + call.CallStatus);
-                    
-                }
+                
             }
 
             PressEnter();
