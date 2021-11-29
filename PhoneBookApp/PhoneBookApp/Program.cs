@@ -254,6 +254,7 @@ namespace PhoneBookApp
         private static void EditingContactPreferences(Dictionary<Contact, List<Call>> phoneBook)
         {
             var name = NameInput(phoneBook);
+            name = CheckingIfNameExists(name, phoneBook);
 
             PrintPreference();
             var input = Console.ReadLine();
@@ -268,6 +269,7 @@ namespace PhoneBookApp
                     {
                         if (name == contact.Name)
                             contact.PreferenceValue = preference;
+                                            
                     }
 
                     PrintAllContacts(phoneBook);
