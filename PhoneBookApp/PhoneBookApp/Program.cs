@@ -114,7 +114,7 @@ namespace PhoneBookApp
         {
             while (CheckingName(name))
             {
-                Console.WriteLine("!Ime ne može biti prazno ili sadržavati brojeve! Molim vas ponovo unesite.");
+                Console.WriteLine("Ime ne može biti prazno ili sadržavati brojeve! Molim vas ponovo unesite.");
                 Console.Write("\r\nUnesite ime i prezime: ");
                 name = Console.ReadLine();               
             }
@@ -138,17 +138,23 @@ namespace PhoneBookApp
         {
             int count = 0;
 
-            foreach (var contact in phoneBook.Keys)
+            while (true)
             {
-                if (name == contact.Name)
-                    count++;
-            }
+                foreach (var contact in phoneBook.Keys)
+                {
+                    if (name == contact.Name)
+                        count++;
+                }
 
-            if (count == 0)
-            {
-                Console.WriteLine("Kontakt s tim imenom i prezimenom ne postoji! Molim vas ponovo unesite.");
-                Console.Write("\r\nUnesite ime i prezime: ");
-                name = Console.ReadLine();
+                if (count == 0)
+                {
+                    Console.WriteLine("Kontakt s tim imenom i prezimenom ne postoji! Molim vas ponovo unesite.");
+                    Console.Write("\r\nUnesite ime i prezime: ");
+                    name = Console.ReadLine();
+                }
+
+                if (count != 0)
+                    break;
             }
 
             return name;
