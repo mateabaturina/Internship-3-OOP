@@ -10,8 +10,9 @@ namespace PhoneBookApp
         static void Main(string[] args)
         {   
             var phoneBook = new Dictionary<Contact, List<Call>>();
-            phoneBook.Add(new Contact("Mate Matić", "0991234567", 1), new List<Call>() {new Call (DateTime.Now, 1),
-                                                                                       {new Call (DateTime.Now, 2) } });
+            phoneBook.Add(new Contact("Mate Matić", "0991234567", 1), new List<Call>() {new Call (DateTime.Now, 3),
+                                                                                        new Call (DateTime.Now, 1),
+                                                                                        new Call(new DateTime(2021,12,3,12,2,22), 2)});
             phoneBook.Add(new Contact("Ana Anić", "0995671234", 2), new List<Call>() { new Call(DateTime.Now, 1) });
             phoneBook.Add(new Contact("Ena Enić", "0987654321", 3), new List<Call>() { new Call(DateTime.Now, 3) });
 
@@ -253,6 +254,41 @@ namespace PhoneBookApp
             Console.Write("\r\nUnesite odabir: ");
         }
 
+        private static void ChangeContactPreferences(string name, string input, Dictionary<Contact, List<Call>> phoneBook)
+        {
+            foreach (var contact in phoneBook.Keys)
+            {
+                if (name == contact.Name)
+
+                    switch (input)
+                    {
+                        case "1":
+                            contact.PreferenceValue = Contact.Preference.Favorite;
+                            break;
+                        case "2":
+                            contact.PreferenceValue = Contact.Preference.Normal;
+                            break;
+                        case "3":
+                            contact.PreferenceValue = Contact.Preference.Blocked;
+                            break;
+                    }
+            }
+        }
+
+        private static string CheckingPreferenceInput(string input)
+        {
+            while (input != "1" | input != "2" | input != "3")
+            {
+                Console.WriteLine("Preferenca mora biti jedno od ponuđenih( 1 - favorit/ 2 - normalan/ 3 - blokiran kontakt )! Molim vas ponovo unesite.");
+                Console.Write("\r\nUnesite novu preferencu( 1 - favorit/ 2 - normalan/ 3 - blokiran kontakt ): ");
+                input = Console.ReadLine();
+
+                if (input == "1" | input == "2" | input == "3")
+                    break;
+            }
+            return input;
+        }
+
         private static void EditingContactPreferences(Dictionary<Contact, List<Call>> phoneBook)
         {
             var name = NameInput(phoneBook);
@@ -260,29 +296,11 @@ namespace PhoneBookApp
 
             PrintPreference();
             var input = Console.ReadLine();
-           
-            while (true)
-            {
-                if (input == "1" | input == "2" | input == "3")
-                {
-                    Contact.Preference preference = (Contact.Preference)Enum.Parse(typeof(Contact.Preference), input);
+            input = CheckingPreferenceInput(input);
 
-                    foreach (var contact in phoneBook.Keys)
-                    {
-                        if (name == contact.Name)
-                            contact.PreferenceValue = preference;                 
-                    }
-                }
+            ChangeContactPreferences(name, input, phoneBook);
 
-                else
-                {
-                    Console.WriteLine("Preferenca mora biti jedno od ponuđenih( 1 - favorit/ 2 - normalan/ 3 - blokiran kontakt )! Molim vas ponovo unesite.");
-                    Console.Write("\r\nUnesite novu preferencu( 1 - favorit/ 2 - normalan/ 3 - blokiran kontakt ): ");
-                    input = Console.ReadLine();
-                }
-
-                PrintAllContacts(phoneBook);
-            }         
+            PrintAllContacts(phoneBook);
         }
 
         private static void PrintSubmenu()
@@ -314,13 +332,14 @@ namespace PhoneBookApp
             }
         }
 
-        private static void CheckingIfListIsEmpty(string name, Dictionary<Contact, List<Call>> phoneBook)
+        /*private static void CheckingIfListIsEmpty(string name, Dictionary<Contact, List<Call>> phoneBook)
         {
             foreach (var contact in phoneBook.Keys)
             {
                 while (name == contact.Name)
                 {
-                    List<Call> value = phoneBook[contact];
+                    //List<Call> value = phoneBook[contact];
+                    var call = phoneBook[contact];
 
                     if (!(value?.Any() ?? false))
                     {
@@ -330,8 +349,8 @@ namespace PhoneBookApp
                     }
                 }
             } 
-        }
-       
+        }*/
+
         private static void PrintAllCallsWithContact(Dictionary<Contact, List<Call>> phoneBook)
         {
             var name = NameInput(phoneBook);
@@ -343,8 +362,11 @@ namespace PhoneBookApp
             {
                 while (name == contact.Name)
                 {
-                    foreach (var call in phoneBook[contact])                   
-                        Console.WriteLine("Vrijeme poziva: " + call.TimeOfCall + " Status poziva: " + call.CallStatus);
+                    var call = phoneBook[contact];
+                    call = call.OrderByDescending(x => x.TimeOfCall).ToList();
+
+                    foreach (var item in call)                   
+                        Console.WriteLine("Vrijeme poziva: " + item.TimeOfCall + " Status poziva: " + item.CallStatus);
                     
                     break;
                 } 
@@ -372,7 +394,7 @@ namespace PhoneBookApp
             foreach (var contact in phoneBook.Keys)
             {
                 foreach (var call in phoneBook[contact])
-                {
+                { 
                     if (call.CallStatus == Call.Status.InProgress)
                         count++;
                 }
