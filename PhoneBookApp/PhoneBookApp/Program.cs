@@ -387,7 +387,7 @@ namespace PhoneBookApp
 
             Random random = new Random(DateTime.Now.Millisecond);
 
-            var answerChoice = 2;//random.Next(1, 3);
+            var answerChoice = random.Next(1, 3);
             var callDuration = random.Next(1, 20);
 
             Call currentCall = new Call(DateTime.Now, answerChoice);
